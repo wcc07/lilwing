@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
       - name: Build game
         working-directory: world-order
         run: |
