@@ -1,0 +1,50 @@
+name: Deploy WORLD ORDER to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "world-order/**"
+      - ".github/workflows/deploy-world-order.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build game
+        working-directory: world-order
+        run: |
+          npm install
+          npm run build
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: world-order/dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Publish site
+        id: deployment
+        uses: actions/deploy-pages@v4
